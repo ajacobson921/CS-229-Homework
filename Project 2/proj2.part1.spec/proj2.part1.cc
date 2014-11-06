@@ -110,7 +110,10 @@ Direct:: Direct()
 Direct:: ~Direct()
 // Frees heap memory if seq is not NULL.
 {
-	
+	if(seq != NULL)
+	{
+		delete[] seq;
+	}
 }
 
 string Direct:: getName() const
