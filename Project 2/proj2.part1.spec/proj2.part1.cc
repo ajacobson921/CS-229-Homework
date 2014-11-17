@@ -19,6 +19,8 @@ using namespace std; // a container for a set of identifiers.
 void fatal(const char *msg); // a wrapper function
 void fatal(const char *msg, const char *name); // a wrapper function
 void ckopeninf(ifstream &infile, const char *fname); // a wrapper function
+int max(int a, int b);
+int sigma(int a, int b, int match, int penalty);
 
 struct scoretp  // a structure for scoring parameters
  { int  match;  // a positive score for a pair of identical DNA letters
@@ -66,7 +68,30 @@ Direct:: Direct(const char *fname)
 // The constructor prints out a proper error message if fname is NULL,
 // no file exists with the given name.
 {
-  
+  ifstream in;
+  string line;
+  string toAdd; 
+  ckopeninf(&in, fname);
+  if(in.is_open())
+  {
+    if(getline(in, name))
+    {
+      name << '\n';
+    }
+    if(getline(in, seq))
+    {
+      while(!in.eof())
+      {
+        while(getline(in, toAdd))
+        {
+          toAdd << '\n';
+          seq += toAdd;
+          toAdd = NULL;
+        }
+      }
+    }
+  }
+  length = seq.getLength();
 }
 
 Direct:: Direct(string &stag, int slen, char *sarr)
@@ -177,13 +202,55 @@ Matrix:: Matrix(Direct &seqone, Direct &seqtwo, struct scoretp &param)
 // that of seqtwo. The sequence in seqone is treated as the sequence A.
 : origin(seqone), derived(seqtwo)  // an initialization list.
 {
+  *origin = &seqone;
+  *derived = &seqtwo;
+  rowind = origin.getSeq().getLength();
+  colind = derived.getSeq().getLength();
+  if(rowind < 1 || colind < 1)
+  {
+    fatal("Can't make a matrix with 0 dimension");
+  }
+  Dmat = get2dspace(rowind+1, colind+1);
+  Smat = get2dspace(rowind+1, colind+1);
+  Imat = get2dspace(rowind+1, colind+1);
 
+  Spt[m][n] = 0;
+  Dpt[m][n] = (Spt[m][n]) - q;
+  Ipt[m][n] = (Spt[m][n]) - q;
+  for(int j = n; j > 0; j--)
+  {
+      Ipt[m][j] = Ipt[m][j-1] - r;
+      Spt[m][j] = Ipt[m][j];
+      Dpt[m][j] = Spt[m][j] - q;
+  }
+  for(int i = m; i > 0; i--)
+  {
+      Dpt[i][n] = Dpt[i+1][n] - r;
+      Spt[i][n] = Dpt[i][n];
+      Ipt[i][n] = Spt[i][n] - q;
+      for(int j = n; j > 0; j--)
+      {
+          Dpt[i][j] = max(Dpt[i+1][j] - r, Spt[i+1][j] - q - r);
+          Ipt[i][j] = max(Ipt[i][j+1] - r, Spt[i][j+1] - q - r);
+          Spt[i][j] = max(Spt[i+1][j+1] + sigma(sonept->seq[i], stwopt->seq[i], 10, papt->mismat), max(Dpt[i][j], Ipt[i][j]));
+      }
+  }
 }
 
 // Frees heap memory.
 Matrix:: ~Matrix()
 {
-
+ 
+  delete &origin;
+  delete &derived;
+  delete colind;
+  free2dspace(rowind, Dmat);
+  free2dspace(rowind, Imat);
+  free2dspace(rowind, Smat);
+  delete Dmat;
+  delete Imat;
+  delete Smat;
+  delete rowlind;
 }
 
 int** Matrix:: get2dspace(int rowind, int colind)
@@ -191,7 +258,8 @@ int** Matrix:: get2dspace(int rowind, int colind)
 // and returns its memory address.
 // Prints out an error message if rowind or colind is less than 0.
 {
-
+  int** mat[rowind+1][colind+1];
+  return &mat;
 }
 
 void Matrix:: free2dspace(int rowind, int **arr)
@@ -200,9 +268,15 @@ void Matrix:: free2dspace(int rowind, int **arr)
 // and then releasing the memory for arr.
 // Prints out an error message if rowind is less than 0.
 {
-    delete[]
-
-
+    if(rowind < 0)
+    {
+      fatal("Rowind less than 0");
+    }
+    for(int i = 0; i < rowind+1, i++)
+    {
+      delete arr[i];
+    }
+    delete arr;
 }
 
 Direct& Matrix:: getOrigin() const
@@ -247,6 +321,10 @@ int** Matrix:: getMat(char kind) const
   {
     return &Imat;
   }
+  else
+  {
+    fatal("Not a kind of matrix");
+  }
 }
 
 string Matrix:: toString(char kind) const
@@ -256,8 +334,24 @@ string Matrix:: toString(char kind) const
 // This function is for your own use to check on each matrix,
 // so any format is OK.
 {
+  if(kind == 'D')
+  {
 
+  }
+  else if(kind == 'S')
+  {
+
+  }
+  else if(kind == 'I')
+  {
+
+  }
+  else
+  {
+
+  }
 }
+
 
 class Alignment // a class for an object holding an optimal alignment  
  { private:
@@ -300,13 +394,29 @@ Alignment:: Alignment(Matrix &matobj, struct scoretp &param)
 // Note that the length of an optimal alignment cannot exceed the sum of
 // the lengths of the two DNA sequences.
 {
-  
+  if(matobj.getOrigin.getLength() == 0 || matobj.getDerived().getLength() == 0)
+  {
+    fatal("Origin or derived is length 0");
+  }
+  &origin = matobj.getOrigin();
+  &derived = matobj.getDerived();
+
+
+
 }
 
 // Frees heap memory.
 Alignment::  ~Alignment() // destructor definition
 {
-
+  delete origin;
+  delete derived;
+  delete score;
+  delete editnum;
+  delete subinsertlen;
+  delete alignlen;
+  delete[] top;
+  delete[] mid;
+  delete[] bot;
 }
 
 Direct& Alignment:: getOrigin() const
@@ -383,7 +493,7 @@ string Alignment:: toString() const
 // of three rows. The sequence positions of the first DNA letters in each section are
 // reported in the left margin of 10 spaces.
 {
- 
+  
 }
 
 class Encoded        // a class for an object holding compression information.
@@ -391,7 +501,7 @@ class Encoded        // a class for an object holding compression information.
     Direct &origin;  // reference to a Direct object called an original sequence
     char *subinsertion; // an array holding a concatenated sequence of parts in subs and insertions
     int  subinsertlen;  // the length of the concatenated sequence
-struct Edit *operation; // an array holding a number of edit operations
+    struct Edit *operation; // an array holding a number of edit operations
     int  editnum;       // the number of edit operations
     string dname;	// the name of the derived sequence
     int   dlength;      // the length of the drived sequence
@@ -426,13 +536,77 @@ Encoded:: Encoded(Alignment &obj)
 // The construction uses top & mid & bot, the three rows of the optimal alignment,
 // which are provided by the public functions of Alignment from the object obj.
 {
+  &origin = obj.getOrigin;
+  editnum = obj.getEditNum();
+  subinsertlen = obj.getSubInsertLen();
+  
+  int i = j = 1;
+  int opind = 0;
+  int snind = 0;
+  for(int ind = 0; i < obj.getAlignLen(); )
+  {
+    char top = getRow('T')[ind];
+    char mid = getRow('M')[ind];
+    char bot = getRow('B')[ind];
+
+    //same
+    if(top == bot  && mid == '|')
+    {
+      i++;
+      j++;
+      ind++;
+      continue;
+    }
+
+    //substitution
+    if(top != bot && mid = ' ')
+    {
+      operation[opind].position = i;
+      operation[opind++].indel = 0;
+      subinsertion[snind++] = bot[ind];
+      i++; 
+      j++; 
+      ind++; 
+      continue;
+    }
+
+    //deletion
+    int gaplen = ;
+    operation[opind].position = i;
+    if(bot == ' ' && mid = '-')
+    {
+      i += gaplen;
+      operation[opind++].indel = -gaplen;
+      ind += gaplen;
+    }
+    //insertion
+    else
+    {
+      j+= gaplen;
+      operation[opind++].indel = gaplen;
+      for (; gaplen; gaplen--)
+      {
+        subinsertion[snind++] = bot[ind++];
+      }
+    }
+
+  }
+
 
 }
 
 Encoded:: ~Encoded()
 // Frees heap memory.
 {
-
+  delete origin;
+  delete[] subinsertion;
+  delete subinsertlen;
+  delete operation.position;
+  delete operation.indel;
+  delete operation;
+  delete editnum;
+  delete dname;
+  delete dlength;
 }
 
 char* Encoded:: getDSeq() const
@@ -445,9 +619,10 @@ char* Encoded:: getDSeq() const
 // The information on the sequence A is obtained by calling the public
 // functions of Direct from the object reference origin.
 {
+
  int i = 1;
  int j = 1;
- for(int snind = opind = 0; opind< editnum; opind++)
+ for(int snind = opind = 0; opind < editnum; opind++)
  {
  	int oppos = operation[opind].position;
  	int indel = operation[opind].indel;
@@ -469,7 +644,7 @@ char* Encoded:: getDSeq() const
 Direct& Encoded:: getOrigin() const
 // Returns origin.
 {
- return origin;
+ return &origin;
 }
 
 int Encoded:: getEditNum() const
@@ -481,7 +656,7 @@ int Encoded:: getEditNum() const
 struct Edit* Encoded:: getOperation() const 
 // Returns operation.
 {
- return operation;
+ return *operation;
 }
 
 int Encoded:: getSubInsertLen() const
@@ -544,7 +719,7 @@ int main(int argc, char *argv[])
  };
   // Declares and constructs a Direct object named seqone for the sequence in file argv[1].
 Direct *seqone = new Direct(argv[1]);
-  // Declares and constructs a Direct object named seqtwo for the sequence in file argv[2].
+  / Declares and constructs a Direct object named seqtwo for the sequence in file argv[2].
 Direct *seqtwo = new Direct(argv[2]);
   // Declares and constructs a Matrix object named matobj for the matrices.
 Matrix *matobj = new Matrix(&seqone, &seqtwo, &pararec);
@@ -562,16 +737,16 @@ cout << alignobj.toString();
   // Sends the contents in the object encodobj to cout by calling toString() from it.
 cout << encodobj.toString();
   // Gets the sequence in seqtwo by calling getSeq().
-
+Direct *dseq = seqtwo.getSeq();
   // Derives the sequence in dseq by calling getDSeq() from encodobj.
-
+encodobj.getDSeq();
   // Runs strcmp() on the two sequences and prints out one of the two
   // messages based on the comparison:
   //  The original and derived sequences are identical.
   //  The original and derived sequences are different.
-
+if(strcmp(, dseq.getDerived()))
   // Prints out each of the two sequences.
-
+cout <<
   // sends each matrix to cout by calling the toString() of Matrix from matobj.
 
   return 0;
@@ -597,4 +772,28 @@ void ckopeninf(ifstream &infile, const char *fname)
 	infile.open(fname);
 	if ( infile.fail() )
 	  fatal("ckopeninf: cannot open input file ", fname);
+}
+
+int max(int a, int b)
+{
+    if( a > b)
+    {
+        return a;
+    }
+    else
+    {
+        return b;
+    }
+}
+
+int sigma(int a, int b, int match, int penalty)
+{
+    if(a==b)
+    {
+        return match;
+    }
+    else
+    {
+        return penalty;
+    }
 }
