@@ -1,3 +1,19 @@
+#include <iostream> // provides objects like cin and cout for sending data
+                    // to and from the standard streams input and output.
+        // These objects are part of the std namespace.
+#include <cstdlib>  // has exit etc.
+#include <fstream>  // file streams and operations
+#include <sstream>  // string streams and operations
+using namespace std; // a container for a set of identifiers.
+                     // Because of this line, there is no need to use std::cout
+#include <typeinfo> // This header file is included for using typeid.
+#include <stdexcept>
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>  // A library with functions for testing characters.
+#include "Encoded.hh"
+
 class Encoded        // a class for an object holding compression information.
  { private:
     Direct &origin;  // reference to a Direct object called an original sequence
