@@ -1,0 +1,19 @@
+A stack of Encoded pointers
+Min's number of differences: 3
+Min's name : C
+Min's derived sequence:  AGCTATCGACT
+
+Max's number of differences: 4
+Max's name : B
+Max's derived sequence:  AGCTAGCGCT
+
+
+A stack of Compressed pointers
+Min's number of differences: 3
+Min's name : D
+Min's derived sequence:  AGCTAGCGACT
+
+Max's number of differences: 4
+Max's name : E
+Max's derived sequence:  AGCTATCGCT
+
