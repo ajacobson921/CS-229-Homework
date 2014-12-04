@@ -36,6 +36,8 @@ class Encoded        // a class for an object holding compression information.
     Direct& getOrigin() const; // return origin.
     string toString() const; // generates a string form of its contents.
     char* getDSeq() const;   // deirves a sequence and turns it in a char array.
+    bool operator<=(Encoded &rightobj) const;
+    int getNumDiff() const;
  };
 
 Encoded:: Encoded(Alignment &obj)
@@ -243,4 +245,33 @@ string Encoded:: toString() const
       subin++:
     } 
   }
+}
+bool Encoded::  operator<=(Encoded &rightobj) const
+{
+   int getleft = getNumDiff();
+   int getright = rightobj.getNumDiff();
+   if(getleft < getright)
+   {
+    return true;
+   }
+   if(getleft == getright)
+   {
+    
+   }
+}
+
+int Encoded :: getNumDiff() const
+{
+
+}
+
+Compressed:: Compressed(Alignment &obj) : Encoded(Alignment &obj)
+{
+
+
+}
+
+bool Compressed :: operator<=(Encoded &rightobj)
+{
+
 }

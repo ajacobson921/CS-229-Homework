@@ -2,8 +2,7 @@
 #define Encoded_G_H
 
 class Encoded        // a class for an object holding compression information.
-{  
-    private:
+{  private:
     Direct &origin;  // reference to a Direct object called an original sequence
     char *subinsertion; // an array holding a concatenated sequence of parts in subs and insertions
     int  subinsertlen;  // the length of the concatenated sequence
@@ -12,7 +11,7 @@ class Encoded        // a class for an object holding compression information.
     string dname;	// the name of the derived sequence
     int   dlength;      // the length of the drived sequence
 
-    public:
+   public:
     Encoded(Alignment &obj); // a normal constructor
     ~Encoded();              // destructor
     int getEditNum() const;  // returns editnum.
@@ -24,6 +23,14 @@ class Encoded        // a class for an object holding compression information.
     Direct& getOrigin() const; // return origin.
     string toString() const; // generates a string form of its contents.
     char* getDSeq() const;   // deirves a sequence and turns it in a char array.
+    bool operator<=(Encoded &rightobj) const;
+    int getNumDiff() const;
+};
+
+class Compressed : public Encoded
+{
+    Compressed(Alignment &obj);
+    bool operator<=(Encoded &rightobj) const;
 };
 
 #endif
