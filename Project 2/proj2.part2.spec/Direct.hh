@@ -1,6 +1,8 @@
+//
 #ifndef Direct_G_H
 #define Direct_G_H
 
+#include "wrapper.hh"
 
 class Direct   // a class for an object holding a sequence
  { private:

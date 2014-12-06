@@ -1,5 +1,7 @@
 //@author Aaron Jacobson ajacob1
-// This is template code from class, downloaded from Blackboard
+
+#ifndef TEMPLATE_STACK_MIN_H
+#define TEMPLATEA_STACK_MIN_H
 
 #include <iostream> // provides objects like cin and cout for sending data
                     // to and from the standard streams input and output.
@@ -15,6 +17,8 @@ using namespace std; // a container for a set of identifiers.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "wrapper.hh"
 
 #define CHAR_SIZE  50 // a macro definition
 
@@ -72,19 +76,13 @@ void Stack<E>:: push(E *obj) // a pointer argument
   top = one;
 }
 
-// Notice the syntax of the definition of member function pop:
-// //      template <class E>
-// //      E Stack<E>:: pop() 
-// // There are three E's in this declaration:
-// // The first one says that the template parameter E is used as a type.
-// // The second E refers to the type returned by the function.
-// // And the third E (the one between angle brackets) says that
-// // the function is defined inside the templated class Stack<E>.
-template <class E>  // see what happens if this line is removed.
-E* Stack<E>:: pop() // see what happens if <E> is removed.
+template <class E>  
+E* Stack<E>:: pop() 
 {
-  if ( top == NULL )
-    fatal("The stack is empty");
+  if (top == NULL)
+    {
+      fatal("The stack is empty");
+    }
   Node<E> *tmp = top;
   E *element = top->element;
   top = top->next;
@@ -95,8 +93,10 @@ E* Stack<E>:: pop() // see what happens if <E> is removed.
 template <class E>
 E* Stack<E>:: peek() // a pointer return type
 {
-  if ( top == NULL )
-    fatal("The stack is empty");
+  if (top == NULL)
+    {
+      fatal("The stack is empty");
+    } 
   E *element = top->element;
   return element;
 }
@@ -107,16 +107,63 @@ bool Stack<E>:: isEmpty()
   return top == NULL;
 }
 
-// Prints out an error message and stops.
-void fatal(const char *msg)
+template <class E>         
+E* findMin(Stack<E> &stack)
 {
-   cerr << "Error message: " << msg << endl;
-   exit(1); // stops unexpectedly.
+  Stack<E> tmp;
+  if (stack.isEmpty())
+  {
+    fatal("The stack is empty");
+  }
+  E &ref = stack.pop(); 
+  tmp.push(ref);
+  E  min = ref;
+  while (!stack.isEmpty())
+   {
+      E &element = stack.pop(); 
+      tmp.push(element);
+      if (element <= min)
+      {
+        min = element;
+      }
+   }
+
+  while ( ! tmp.isEmpty() )   // restores stack
+  {
+    stack.push( tmp.pop() );
+  }
+  return min;
 }
 
-// Prints out an error message along with additional information and stops.
-void fatal(const char *msg, const char *info)
+template <class E>          
+E* findMax(Stack<E> &stack)
 {
-  cerr << "Error message: " << msg << " " << info << endl;
-  exit(1); // stops unexpectedly.
+  Stack<E> tmp;
+  if (stack.isEmpty())
+  {
+    fatal("The stack is empty");
+  }
+  E &ref = stack.pop(); 
+  tmp.push(ref);
+  E  min = ref;
+  while (!stack.isEmpty())
+  {
+     E &element = stack.pop(); 
+     tmp.push(element);
+     if (min <= element)
+     {
+          min = element;
+     }
+  }
+  while (!tmp.isEmpty())
+  {
+    stack.push( tmp.pop() );
+  }
+  return min;
 }
+
+#endif
+
+
+
+

@@ -2,6 +2,11 @@
 #ifndef Matrix_G_H
 #define Matrix_G_H
 
+#include "wrapper.hh"
+#include "prototype.hh"
+#include "Direct.hh"
+
+
 class Matrix   // a class for an object holding the three matrices
  { private:
     Direct &origin;  // reference to a Direct object called an original sequence

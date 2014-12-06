@@ -1,8 +1,17 @@
-#ifndef Encoded_G_H
-#define Encoded_G_H
+//@author Aaron Jacobson ajacob1
+
+#ifndef Encoded_H
+#define Encoded_H
+
+#include "wrapper.hh"
+#include "Direct.hh"
+#include "prototype.hh"
+#include "Matrix.hh"
+#include "Alignment.hh"
+
 
 class Encoded        // a class for an object holding compression information.
-{  private:
+{  protected:
     Direct &origin;  // reference to a Direct object called an original sequence
     char *subinsertion; // an array holding a concatenated sequence of parts in subs and insertions
     int  subinsertlen;  // the length of the concatenated sequence
@@ -29,6 +38,7 @@ class Encoded        // a class for an object holding compression information.
 
 class Compressed : public Encoded
 {
+   public:
     Compressed(Alignment &obj);
     bool operator<=(Encoded &rightobj) const;
 };

@@ -1,3 +1,5 @@
+//@author Aaron Jacobson ajacob1
+
 #include <iostream> // provides objects like cin and cout for sending data
                     // to and from the standard streams input and output.
         // These objects are part of the std namespace.
@@ -12,6 +14,11 @@ using namespace std; // a container for a set of identifiers.
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>  // A library with functions for testing characters.
+#include "wrapper.hh"
+#include "Direct.hh"
+#include "prototype.hh"
+#include "Matrix.hh"
+#include "Alignment.hh"
 #include "Encoded.hh"
 
 class Encoded        // a class for an object holding compression information.
@@ -56,7 +63,7 @@ Encoded:: Encoded(Alignment &obj)
 // The construction uses top & mid & bot, the three rows of the optimal alignment,
 // which are provided by the public functions of Alignment from the object obj.
 {
-  &origin = obj.getOrigin;
+  &origin = obj.getOrigin();
   editnum = obj.getEditNum();
   subinsertlen = obj.getSubInsertLen();
   
@@ -225,7 +232,7 @@ string Encoded:: toString() const
   cout << "Name of the sequence: " + dname;
   cout << "Length of the sequence: "  + dlength;
   cout << "Number of edits: " + editnum;
-  cout << "Length of subsititutions and insertions: "+ subinsertlen;
+  cout << "Length of subsititutions and insertions: "+ getSubInsertLen();
   cout << "Concatenation of subs and inserts: " + getSubInsertion();
   int subin = 0;
   for(int h = 0; h < editnum; h++)
@@ -248,30 +255,63 @@ string Encoded:: toString() const
 }
 bool Encoded::  operator<=(Encoded &rightobj) const
 {
-   int getleft = getNumDiff();
    int getright = rightobj.getNumDiff();
-   if(getleft < getright)
+   if(getNumDiff() < getright)
    {
     return true;
    }
-   if(getleft == getright)
+   if(getNumDiff() == getright)
    {
-    
+      if(subinsertlen <= rightobj.getSubInsertLen())
+      {
+        return true;
+      }
    }
+   return false;
 }
 
 int Encoded :: getNumDiff() const
 {
-
+  int num = 0;
+  struct Edit *op = getOperation();
+  for(int i = 0; i < getEditNum(); i ++)
+  {
+    int toAdd = indel[i];
+    if(indel[i] < 0)
+    {
+      toAdd = 0 - indel[i];
+    }
+    num += toAdd;
+  }
+  return num;
 }
 
 Compressed:: Compressed(Alignment &obj) : Encoded(Alignment &obj)
 {
-
-
 }
 
 bool Compressed :: operator<=(Encoded &rightobj)
 {
-
+   int getright = rightobj.getNumDiff();
+   if(getNumDiff() < getright)
+   {
+    return true;
+   }
+   if(getNumDiff() == getright)
+   {
+      if(subinsertlen < getright.getSubInsertLen())
+      {
+        return true;
+      }
+      else if(subinsertlen == getright.getSubInsertLen())
+      {
+        string left(subinsertion);
+        string right(rightobj.getSubInsertion());
+        if(left <= right)
+        {
+          return true;
+        }
+      }
+   }
+   return false;
 }

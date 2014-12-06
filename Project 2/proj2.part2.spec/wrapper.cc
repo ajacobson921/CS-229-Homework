@@ -1,3 +1,5 @@
+//@author Aaron Jacobson ajacob1
+
 #include <iostream> // provides objects like cin and cout for sending data
                     // to and from the standard streams input and output.
 		    // These objects are part of the std namespace.

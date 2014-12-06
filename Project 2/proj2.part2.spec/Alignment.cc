@@ -13,6 +13,10 @@ using namespace std; // a container for a set of identifiers.
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>  // A library with functions for testing characters.
+#include "wrapper.hh"
+#include "Direct.hh"
+#include "prototype.hh"
+#include "Matrix.hh"
 #include "Alignment.hh"
 
 class Alignment // a class for an object holding an optimal alignment  

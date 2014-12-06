@@ -1,9 +1,4 @@
-// Topics: another look at the use of a reference local variable,
-//         checking the type of a template parameter at runtime,        
-//         function template,
-//         using references,
-//         returning a smallest object from a stack,
-//         returning a smallest reference from a stack.
+//@author Aaron Jacobson @ajacob1
 
 #include <iostream> // provides objects like cin and cout for sending data
                     // to and from the standard streams input and output.
@@ -21,76 +16,73 @@ using namespace std; // a container for a set of identifiers.
 #include <string.h>
 
 #include "wrapper.hh"
-#include "templatestack.min.hh"
 #include "Direct.hh"
-#include "Alignment.hh"
-#include "Matrix.hh"
-#include "Encoded.hh"
 #include "prototype.hh"
+#include "Matrix.hh"
+#include "Alignment.hh"
+#include "Encoded.hh"
+#include "template.stack.min.hh"
 
 int main(int argc, char *argv[])
 {
-   if ( argc != 6 )
-   { cerr << "Usage: " << argv[0] << " Seq1 Seq2 mismatch gap_open gap_extend" << endl << endl;
-     cerr << "Seq1        file of one sequence in FASTA format" << endl;
-     cerr << "Seq2        file of one sequence in FASTA format" << endl;
-     cerr << "mismatch    a negative integer" << endl;
-     cerr << "gap_open    gap open penalty, a non-negative integer" << endl;
-     cerr << "gap_extend  gap extension penalty, a positive integer" << endl;
-     exit(1);
-   }
-
+ 
   // Declares and initializes a struct scoretp variable named pararec.
- struct scoretp pararec
- {
+  struct scoretp pararec
+  {
     match = 10,
-    mismat = argv[3],
-    gopen = argv[4],
-    gext = argv[5]
- };
-  // Declares and constructs a Direct object named seqone for the sequence in file argv[1].
-Direct *seqone = new Direct(argv[1]);
-  // Declares and constructs a Direct object named seqtwo for the sequence in file argv[2].
-Direct *seqtwo = new Direct(argv[2]);
-  // Declares and constructs a Matrix object named matobj for the matrices.
-Matrix *matobj = new Matrix(&seqone, &seqtwo, &pararec);
-  // Declares and constructs an Alignment object named alignobj for the alignment.
-Alignment *alignobj = new Alignment(&matobj, &pararec);
-  // Declares and constructs an Encoded object named encodobj for the differences.
-Encoded *encodobj = new Encoded(&alignobj);
-  // Prints out the scoring parameters.
-cout << "Match: 10";
-cout << "Mismatch: " + pararec->mismat;
-cout << "Gap open penalty: " + pararec->gopen;
-cout << "Gap extension penalty: " + pararec->gext;
-  // Sends the alignment along with other information to cout by calling toString() from alignobj.
-cout << alignobj.toString();
-  // Sends the contents in the object encodobj to cout by calling toString() from it.
-cout << encodobj.toString();
-  // Gets the sequence in seqtwo by calling getSeq().
-Direct *dseq = seqtwo.getSeq();
-  // Derives the sequence in dseq by calling getDSeq() from encodobj.
-encodobj.getDSeq();
-  // Runs strcmp() on the two sequences and prints out one of the two
-  // messages based on the comparison:
-  //  The original and derived sequences are identical.
-  //  The original and derived sequences are different.
-if(strcmp(alignobj.getOrigin().getName(), dseq.getDerived().getName()) == 0)
-{
-  cout << "The original and derived sequences are identical.";
-}
-else
-{
-  cout << "The original and derived sequences are different.";
-}
-  // Prints out each of the two sequences.
-  cout << alignobj.getOrigin().getSeq();
-  // sends each matrix to cout by calling the toString() of Matrix from matobj.
-  cout << alignlen.getDerived().getSeq();
-  // cout << alignobj.getDerived().getSeq();
-  // cout << matobj.toString('D');
-  // cout << matobj.toString('S');
-  // cout << matobj.toString('I');
+    mismat = -20,
+    gopen = 40,
+    gext = 2
+  };
+  // Declares and constructs a Direct object named origin for the sequence in file argv[1].
+  Direct *origin = new Direct(argv[1]);
+  Stack<Encoded> enc;
+  Stack<Encoded> comp;
+
+  for(int i = 2; i < argc - 1; i++)
+  {
+    // Declares and constructs a Direct object named seqtwo for the sequence in file argv[2].
+    Direct *derived = new Direct(argv[2]);
+    // Declares and constructs a Matrix object named m for the matrices.
+    Matrix *m = new Matrix(&sorigin, &derived, &pararec);
+    // Declares and constructs an Alignment object named a for the alignment.
+    Alignment *a = new Alignment(&m, &pararec);
+    // Declares and constructs an Encoded object named e for the differences.
+    Encoded *e = new Encoded(&a);
+    // Push the encoded object on to the Encoded stack
+    enc.push(*e);
+    // Create and construct a COmpress object named c
+    Compressed *c = new Compressed(&a);
+    // Push the compressed object on to its respective stack
+    comp.push(&a);
+  }
+  
+  Encoded *smallE = findMin(&enc);
+
+  Encoded *bigE = findMax(&enc);
+
+  Encoded *smallC = findMin(&comp);
+
+  Encoded *bigC = findMax(&comp);
+
+  cout << "A stack of Encoded pointers" << endl;
+  cout << "Min Encoded number of differences: " + smallE.getNumDiff() << endl;
+  cout << "Min Encoded name: " + smallE.getDName() << endl;
+  cout << "Min Encoded sequence: " + smallE.getDSeq() << endl << endl;
+
+  cout << "Max Encoded number of differences: " + bigE.getNumDiff() << endl;
+  cout << "Max Encoded name: " + bigE.getDName() << endl;
+  cout << "Max Encoded sequence: " + bigE.getDSeq() << endl << endl;
+  
+  cout << "A stack of Compressed pointers" << endl;
+  cout << "Min Compressed number of differences: " + smallC.getNumDiff() << endl;
+  cout << "Min Compressed name: " + smallC.getDName() << endl;
+  cout << "Min Compressed sequence: " + smallC.getDSeq() << endl << endl;
+
+  cout << "Max Compressed number of differences: " + bigC.getNumDiff() << endl;
+  cout << "Max Compressed name: " + bigC.getDName() << endl;
+  cout << "Max Compressed sequence: " + bigC.getDSeq() << endl << endl;
+
 
   return 0;
 }

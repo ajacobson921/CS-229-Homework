@@ -1,6 +1,13 @@
 #ifndef Alignment_G_H  
 #define Alignment_G_H 
 
+#include "wrapper.hh"
+#include "prototype.hh"
+#include "Direct.hh"
+#include "Matrix.hh"
+
+
+
 class Alignment // a class for an object holding an optimal alignment  
  { private:
     Direct &origin;  // reference to a Direct object called an original sequence

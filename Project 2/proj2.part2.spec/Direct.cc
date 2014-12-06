@@ -14,6 +14,7 @@ using namespace std; // a container for a set of identifiers.
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>  // A library with functions for testing characters.
+#include "wrapper.hh"
 #include "Direct.hh"
 
 class Direct   // a class for an object holding a sequence

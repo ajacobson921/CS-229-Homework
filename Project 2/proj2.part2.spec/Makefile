@@ -1,28 +1,31 @@
-# An example makefile for C++ code
+#@author Aaron Jacobson ajacob1
 
-OBJS = main.o  Direct.o  wrapper.o  Encoded.o
+OBJS = wrapper.o  Direct.o  Matrix.o  Alignment.o  Encoded.o  main.o
 CC = g++
 CFLAGS = -Wall -c -g
 LFLAGS = -Wall -g
 
 cmps : $(OBJS)
-	$(CC)  $(LFLAGS)  $(OBJS)  -o  demo
+	$(CC)  $(LFLAGS)  $(OBJS)  -o  cmps
 # Each command must begin with a TAB.
-
-main.o : main.cc  Organism.hh  template.hh  wrapper.hh
-	$(CC)  $(CFLAGS)  main.cc
-
-Direct.o : Direct.cc  Direct.hh  wrapper.hh
-	$(CC)  $(CFLAGS)  Organism.cc
 
 wrapper.o : wrapper.cc  wrapper.hh
 	$(CC)  $(CFLAGS)  wrapper.cc
 
-Encoded.o : Encoded.cc  Encoded.hh  wrapper.hh
+Direct.o : Direct.cc  Direct.hh  wrapper.hh 
+	$(CC)  $(CFLAGS)  Direct.cc
+
+Matrix.o : Matrix.cc  Matrix.hh  wrapper.hh  prototype.hh
+	$(CC)  $(CFLAGS)  Matrix.cc
+
+Alignment.o : Alignment.cc  Alignment.hh  wrapper.hh  Matrix.hh  Direct.hh  prototype.hh
+	$(CC)  $(CFLAGS)  Alignment.cc
+
+Encoded.o : Encoded.cc  Encoded.hh  Alignment.hh  wrapper.hh  Matrix.hh  Direct.hh  prototype.hh
 	$(CC)  $(CFLAGS)  Encoded.cc
 
-
-
+main.o : main.cc  template.stack.min.hh  Encoded.hh  Alignment.hh  wrapper.hh  Matrix.hh  Direct.hh  prototype.hh
+	$(CC)  $(CFLAGS)  main.cc
 
 
 # Removes all .o files and executables.
@@ -30,4 +33,4 @@ Encoded.o : Encoded.cc  Encoded.hh  wrapper.hh
 # for whether to remove the file.
 
 clean : 
-	\rm  *.o  demo
+	\rm  *.o  cmps

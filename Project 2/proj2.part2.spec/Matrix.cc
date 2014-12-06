@@ -14,6 +14,9 @@ using namespace std; // a container for a set of identifiers.
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>  // A library with functions for testing characters.
+#include "wrapper.hh"
+#include "prototype.hh"
+#include "Direct.hh"
 #include "Matrix.hh"
 
 class Matrix   // a class for an object holding the three matrices
